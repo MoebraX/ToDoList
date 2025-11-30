@@ -103,7 +103,7 @@ def add_task() -> None:
     print("<New task created successfully.>")
 
 
-def list_tasks() -> None:
+def list_tasks() -> Project | None:
     if pass_projects_from_db() == []:
         print("<There's no existing project.>")
         return
@@ -116,5 +116,23 @@ def list_tasks() -> None:
     for task in project.tasks:
         print(f"\t{task.id}\t|\t{task.name}\t|\t{task.description}\t|\t{task.status}\t|\t{task.deadline}")
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    return project
 
     
+def change_task_status() -> None:
+    project = list_tasks()
+    if project == None:
+        return
+    flag = False
+    while flag == False :
+        target_id = int(input("Enter task id: "))
+        for task in project.tasks:
+            if target_id == task.id :
+                flag = True
+                status = ""
+                while True:
+                    status = str(input("Enter new status (todo/doing/done): "))
+                    if status in ("todo", "doing", "done"):
+                        break
+                task.status = status
+    print("<Status changed successfully.>")

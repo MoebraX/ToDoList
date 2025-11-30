@@ -8,7 +8,8 @@ while(True):
          Edit details of a project-> 3
          Delete a project-> 4
          Create a new task-> 5
-         List all tasks of a project-> 6""")
+         List all tasks of a project-> 6
+         Change status of a task-> 7""")
     command = input()
     match command:
         case "1":
@@ -23,5 +24,7 @@ while(True):
             add_task()
         case "6":
             list_tasks()
+        case "7":
+            change_task_status()
         case _:
             pass

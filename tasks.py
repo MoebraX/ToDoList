@@ -75,3 +75,5 @@ def create_task() -> Task:
     inputs = input_task()
     new_task = Task(inputs)
     return new_task
+
+
