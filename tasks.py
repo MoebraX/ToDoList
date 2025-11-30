@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Literal
+from typing import TypedDict
 
 class Task:
     _id_counter = 0

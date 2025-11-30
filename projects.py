@@ -1,4 +1,4 @@
-import tasks
+from tasks import *
 
 class Project:
     _id_counter = 0
@@ -20,7 +20,13 @@ def pass_projects_from_db() -> list[Project] :
 def add_project_to_db( project: Project) -> None:
     projects_db.append(project)
 
-def create_project() -> Project:
+
+class ProjectDict(TypedDict):
+    name: str
+    description: str = "-"
+    
+
+def input_project() -> ProjectDict:
     while True:
         name = str(input("Enter a name: "))
         if name == "" or name.isspace():
@@ -42,11 +48,18 @@ def create_project() -> Project:
         if description == " " or description.isspace():
             description = "-"
         break
-    new_project = Project(name, description)
+    inputs = ProjectDict (name=name , description= description)
+    return inputs
+
+
+def create_project() -> Project:
+    inputs = input_project()
+    new_project = Project(inputs["name"], inputs["description"])
     add_project_to_db(new_project)
     print("<Project created successfully!>")
     return new_project
     
+
 def list_projects() -> None:
     if pass_projects_from_db() == []:
         print("<There's no existing project.>")
@@ -56,3 +69,26 @@ def list_projects() -> None:
     for project in pass_projects_from_db():
         print(f"\t{project.id}\t|\t{project.name}\t|\t{project.description}")
     print("__________________________")
+
+
+def edit_project() -> None:
+    if pass_projects_from_db() == []:
+        print("<There's no existing project.>")
+        return
+    list_projects()
+    flag = False
+    while flag == False:
+        print("Enter project's id: ")
+        target_id = int(input())
+        for project in pass_projects_from_db():
+            if project.id == target_id:
+                inputs = input_project()
+                project.name = inputs["name"]
+                project.description = inputs["description"]
+                flag = True
+                print("<Project's details was changed successfully.>")
+                break
+        if flag == False :
+            print("The entered id was not found. Try again.")    
+
+    
