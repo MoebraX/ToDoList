@@ -10,6 +10,12 @@ class Project:
 
 projects_db: list[Project] = []
 
+def pass_projects_from_db() -> list[Project] :
+    return projects_db
+
+def add_project_to_db( project: Project) -> None:
+    projects_db.append(project)
+
 def create_project () -> Project:
     while True:
         name = str(input("Enter a name: "))
@@ -19,7 +25,7 @@ def create_project () -> Project:
         if len(name) > 30:
             print("Name can't be longer than 30 characters. Try a shorter name.")
             continue
-        for project in projects_db:
+        for project in pass_projects_from_db():
             if name == project.name:
                 print("This name already exists. Try another name.")
                 continue
@@ -35,4 +41,7 @@ def create_project () -> Project:
     new_project = Project(name, description)
     return new_project
     
-       
+def list_projects() -> None:
+    print("\tID\t|\tName\t|\tDescription")
+    for project in pass_projects_from_db:
+        pass
