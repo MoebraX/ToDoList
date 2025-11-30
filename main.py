@@ -5,7 +5,9 @@ while(True):
     print("\nHi. What can I do for you?")
     print("""\t Create new project-> 1
          See list of all existing projects-> 2
-         Edit details of a project-> 3""")
+         Edit details of a project-> 3
+         Delete a project-> 4
+         Create a new task-> 5""")
     command = input()
     match command:
         case "1":
@@ -14,5 +16,9 @@ while(True):
             list_projects()
         case "3":
             edit_project()
+        case "4":
+            pass
+        case "5":
+            add_task()
         case _:
             pass
