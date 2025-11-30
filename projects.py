@@ -44,9 +44,15 @@ def create_project() -> Project:
         break
     new_project = Project(name, description)
     add_project_to_db(new_project)
+    print("<Project created successfully!>")
     return new_project
     
 def list_projects() -> None:
+    if pass_projects_from_db() == []:
+        print("<There's no existing project.>")
+        return
+    print("__________________________")
     print("\tID\t|\tName\t|\tDescription")
-    for project in pass_projects_from_db:
-        pass
+    for project in pass_projects_from_db():
+        print(f"\t{project.id}\t|\t{project.name}\t|\t{project.description}")
+    print("__________________________")
