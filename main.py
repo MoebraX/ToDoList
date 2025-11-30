@@ -1,2 +1,5 @@
 import projects
-print( "Hello World" )
+
+while(True):
+    print("Hi. What can I do for you?")
+    command = input()
