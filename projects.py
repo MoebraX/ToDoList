@@ -103,11 +103,7 @@ def add_task() -> None:
     print("<New task created successfully.>")
 
 
-def list_tasks() -> Project | None:
-    if pass_projects_from_db() == []:
-        print("<There's no existing project.>")
-        return
-    project = search_project_by_id()
+def list_tasks(project: Project) -> None:
     if len(project.tasks) == 0 :
         print("No task exists.")
         return
@@ -118,21 +114,40 @@ def list_tasks() -> Project | None:
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^")
     return project
 
-    
-def change_task_status() -> None:
-    project = list_tasks()
+
+def search_task_by_project(project: Project) -> Task | None:
     if project == None:
         return
-    flag = False
-    while flag == False :
+    if len(project.tasks) == 0 :
+        print("No task exists.")
+        return
+    while True :
         target_id = int(input("Enter task id: "))
         for task in project.tasks:
             if target_id == task.id :
-                flag = True
-                status = ""
-                while True:
-                    status = str(input("Enter new status (todo/doing/done): "))
-                    if status in ("todo", "doing", "done"):
-                        break
-                task.status = status
+                return task
+        print("Task not found")  
+    
+def change_task_status() -> None:
+    task = search_task_by_project(search_project_by_id())
+    status = ""
+    while True:
+        status = str(input("Enter new status (todo/doing/done): "))
+        if status in ("todo", "doing", "done"):
+            break
+    task.status = status
     print("<Status changed successfully.>")
+
+
+def edit_task() -> None :
+    project = search_project_by_id()
+    list_tasks(project)
+    task = search_task_by_project(project)
+    if task == None:
+        return
+    inputs = input_task()
+    task.name = inputs["name"]
+    task.description = inputs["description"]
+    task.status = inputs["status"]
+    task.deadline = inputs["deadline"]
+    print("<Task's details were edited successfully.>")
