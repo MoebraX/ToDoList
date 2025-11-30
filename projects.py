@@ -103,4 +103,18 @@ def add_task() -> None:
     print("<New task created successfully.>")
 
 
+def list_tasks() -> None:
+    if pass_projects_from_db() == []:
+        print("<There's no existing project.>")
+        return
+    project = search_project_by_id()
+    if len(project.tasks) == 0 :
+        print("No task exists.")
+        return
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    print("\tID\t|\tName\t|\tDescription\t|\tStatus\t|\tDeadline")
+    for task in project.tasks:
+        print(f"\t{task.id}\t|\t{task.name}\t|\t{task.description}\t|\t{task.status}\t|\t{task.deadline}")
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^")
+
     
