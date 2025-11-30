@@ -151,3 +151,24 @@ def edit_task() -> None :
     task.status = inputs["status"]
     task.deadline = inputs["deadline"]
     print("<Task's details were edited successfully.>")
+
+
+def delete_task() -> None:
+    project = search_project_by_id()
+    list_tasks(project)
+    task = search_task_by_project(project)
+    if task == None:
+        return
+    project.tasks.remove(task)
+    del task
+    print("<Task deleted successfully.>")
+
+
+def delete_project() -> None:
+    project = search_project_by_id()
+    for task in project.tasks:
+        project.tasks.remove(task)
+        del task
+    pass_projects_from_db().remove(project)
+    del project
+    print("<Project deleted successfully.>")
