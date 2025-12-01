@@ -1,9 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Literal
-from typing import TypedDict
-from dotenv import load_dotenv
-import os
-load_dotenv()
+from typing import Literal, TypedDict
 
 class TaskDict(TypedDict):
     name: str

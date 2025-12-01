@@ -1,4 +1,8 @@
 from tasks import *
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 class Project:
     _id_counter = 0
