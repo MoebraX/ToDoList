@@ -65,9 +65,9 @@ def input_task() -> TaskDict:
     return inputs
 
 
-def create_task() -> Task:
-    inputs = input_task()
-    new_task = Task(inputs)
-    return new_task
+#def create_task() -> Task:
+ #   inputs = input_task()
+  #  new_task = Task(inputs)
+   # return new_task
 
 

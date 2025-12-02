@@ -6,6 +6,7 @@ from typing import List, TypeVar, Generic, Literal
 
 from db.session import Session
 
+
 T = TypeVar("T")
 class Repository(ABC, Generic[T]):
     @abstractmethod

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Literal, TypedDict
-from repositories import *
+from repositories.repositories import *
 
 
 task_repository = TaskRepository()

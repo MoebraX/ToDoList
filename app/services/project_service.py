@@ -1,4 +1,4 @@
-from task_service import *
+from services.task_service import *
 from dotenv import load_dotenv
 import os
 
@@ -58,101 +58,108 @@ def list_projects() -> None:
     print("__________________________")
 
 
-def search_project_by_id() -> Project:
+def search_project_by_id() -> int | None:
     if project_repository.get_all() == []:
         print("<There's no existing project.>")
         return
     list_projects()
-    flag = False
-    while flag == False:
+    while True:
         print("Enter project's id: ")
         target_id = int(input())
         project = project_repository.get(target_id)
         if project == None :
             print("The entered id was not found. Try again.")
+            return
         else:
-            flag = True
+            return target_id
 
 
 def edit_project() -> None:
-    project = search_project_by_id()
+    id = search_project_by_id()
+    if id == None:
+        return
     inputs = input_project()
-    project.name = inputs["name"]
-    project.description = inputs["description"]    
+    project_repository.update(id, inputs[0], inputs[1])   
 
     
 def add_task() -> None:
     if project_repository.get_all() == []:
         print("<There's no existing project.>")
         return
-    project = search_project_by_id()
-    if len(project.tasks) > int(os.getenv("MAX_NUMBER_OF_TASK")) :
+    id = search_project_by_id()
+    if len(project_repository,get(id).tasks) > int(os.getenv("MAX_NUMBER_OF_TASK")) :
         print("<The max number of tasks for this project is reached.>")
         return
     inputs = input_task()
-    inputs.project_id = project.id
+    inputs.project_id = id
     task_repository.add(inputs)
     print("<New task created successfully.>")
 
 
-def list_tasks(project: Project) -> None:
-    if len(project.tasks) == 0 :
+def list_tasks(id: int) -> None:
+    if len(project_repository.get(id).tasks) == 0 :
         print("No task exists.")
         return
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^")
     print("\tID\t|\tName\t|\tDescription\t|\tStatus\t|\tDeadline")
-    for task in project.tasks:
+    for task in project_repository.get(id).tasks:
         print(f"\t{task.id}\t|\t{task.name}\t|\t{task.description}\t|\t{task.status}\t|\t{task.deadline}")
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^")
 
 
-def search_task_by_project(project: Project) -> Task | None:
-    if project == None:
+def search_task_by_project_id(id: int) -> int | None:
+    if id == None:
         return
-    if len(project.tasks) == 0 :
+    if len(project_repository.get(id).tasks) == 0 :
         print("No task exists.")
         return
     while True :
         target_id = int(input("Enter task id: "))
-        for task in project.tasks:
+        for task in project_repository.get(id).tasks:
             if target_id == task.id :
-                return task
+                return target_id
         print("Task not found")  
     
 def change_task_status() -> None:
-    task = search_task_by_project(search_project_by_id())
+    id = search_task_by_project_id(search_project_by_id())
     status = ""
     while True:
         status = str(input("Enter new status (todo/doing/done): "))
         if status in ("todo", "doing", "done"):
             break
-    task.status = status
+    task = task_repository.get(id)
+    inputs = TypedDict()
+    inputs["name"] = task.name
+    inputs["description"] = task.description
+    inputs["status"] = status
+    inputs["deadline"] = task.deadline
+    inputs["project_id"] = task.project_id
     print("<Status changed successfully.>")
 
 
 def edit_task() -> None :
-    project = search_project_by_id()
-    list_tasks(project)
-    task = search_task_by_project(project)
-    if task == None:
+    id = search_project_by_id()
+    list_tasks(id)
+    task_id = search_task_by_project_id(id)
+    if task_repository.get(id) == None:
         return
     inputs = input_task()
-    inputs.project_id = task.project_id
-    task_repository.update(task.id, inputs)
+    inputs.project_id = task_repository.get(task_id).project_id
+    task_repository.update(task_id, inputs)
     print("<Task's details were edited successfully.>")
 
 
 def delete_task() -> None:
-    project = search_project_by_id()
-    list_tasks(project)
-    task = search_task_by_project(project)
-    if task == None:
+    id = search_project_by_id()
+    list_tasks(id)
+    task_id = search_task_by_project_id(id)
+    if task_id == None:
         return
-    task_repository.delete(task.id)
+    task_repository.delete(task_id)
     print("<Task deleted successfully.>")
 
 
 def delete_project() -> None:
-    project = search_project_by_id()
-    project_repository.delete(project.id)
+    id = search_project_by_id()
+    project_repository.delete(id)
     print("<Project deleted successfully.>")
