@@ -27,7 +27,7 @@ class TaskDict(TypedDict):
     description: str = "-"
     status: Literal["todo", "doing", "done"] = "todo"
     deadline: datetime = None
-    project_id: int = 0
+    project_id: int = 1
 
 
 class Task(Base):
@@ -52,5 +52,6 @@ class Task(Base):
         self.description = inputs["description"]
         self.status = inputs["status"]
         self.deadline = inputs["deadline"] or (datetime.now() + timedelta(days=10))
+        self.project_id = inputs["project_id"]
 
 

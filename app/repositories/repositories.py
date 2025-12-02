@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from models import *
 from sqlalchemy import *
+from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import SQLAlchemyError
 from typing import List, TypeVar, Generic, Literal
 
@@ -33,7 +34,7 @@ class Repository(ABC, Generic[T]):
 class ProjectRepository(Repository[Project]):
     def get(self, id: int) -> Project | None:
         with Session() as session:
-            return session.query(Project).filter(Project.id == id).first()
+            return session.query(Project).options(joinedload(Project.tasks)).filter(Project.id == id).first()
 
     def get_all(self) -> List[Project]:
         with Session() as session:
@@ -83,28 +84,23 @@ class TaskRepository(Repository[Task]):
         with Session() as session:
             return session.query(Task).filter(Task.project_id == project_id).all()
         
-    def add(self, inputs: TaskDict) -> None:
-        session = Session()
-        try:
+    def add(self, inputs: TaskDict) -> Task:
+        with Session() as session:
             task = Task(inputs)
             session.add(task)
             session.commit()
             session.refresh(task)
-        except SQLAlchemyError as e:
-            session.rollback()
-            raise e
-        finally:
-            session.close()
+            return task
         
-    def update(self, id: int, inputs: TaskDict) -> None:
+    def update(self, id: int, inputs: TaskDict) -> Task:
         with Session() as session:
             task = session.query(Task).filter(Task.id == id).first()
             if task is None:
                 raise ValueError(f"Project with id {id} not found")
-            task.name = inputs.name
-            task.description = inputs.description
-            task.status = inputs.status
-            task.deadline = inputs.deadline
+            task.name = inputs["name"]
+            task.description = inputs["description"]
+            task.status = inputs["status"]
+            task.deadline = inputs["deadline"]
             session.commit()
             session.refresh(task)
             return task

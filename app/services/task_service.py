@@ -53,7 +53,7 @@ def input_task() -> TaskDict:
             print("The entered date/time is in the past.")
             continue
         break
-    inputs = TaskDict(name = name, description = description, status = status, deadline = dt)
+    inputs = TaskDict(name = name, description = description, status = status, deadline = dt, project_id = 1)
     return inputs
 
 

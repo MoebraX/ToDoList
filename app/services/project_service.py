@@ -4,14 +4,7 @@ import os
 
 load_dotenv()
 
-projects_db: list[Project] = []
 project_repository = ProjectRepository()
-
-def pass_projects_from_db() -> list[Project] :
-    return projects_db
-
-def add_project_to_db(project: Project) -> None:
-    projects_db.append(project)
     
 
 def input_project() -> list[str]:
@@ -23,7 +16,7 @@ def input_project() -> list[str]:
         if len(name) > 30:
             print("Name can't be longer than 30 characters. Try a shorter name.")
             continue
-        for project in pass_projects_from_db():
+        for project in project_repository.get_all():
             if name == project.name:
                 print("This name already exists. Try another name.")
                 continue
@@ -69,7 +62,6 @@ def search_project_by_id() -> int | None:
         project = project_repository.get(target_id)
         if project == None :
             print("The entered id was not found. Try again.")
-            return
         else:
             return target_id
 
@@ -87,11 +79,14 @@ def add_task() -> None:
         print("<There's no existing project.>")
         return
     id = search_project_by_id()
-    if len(project_repository,get(id).tasks) > int(os.getenv("MAX_NUMBER_OF_TASK")) :
+    if id == None:
+        return
+    length = len(project_repository.get(id).tasks)
+    if length > int(os.getenv("MAX_NUMBER_OF_TASK")) :
         print("<The max number of tasks for this project is reached.>")
         return
     inputs = input_task()
-    inputs.project_id = id
+    inputs["project_id"] = id
     task_repository.add(inputs)
     print("<New task created successfully.>")
 
@@ -115,7 +110,8 @@ def search_task_by_project_id(id: int) -> int | None:
         return
     while True :
         target_id = int(input("Enter task id: "))
-        for task in project_repository.get(id).tasks:
+        tasks = project_repository.get(id).tasks
+        for task in tasks:
             if target_id == task.id :
                 return target_id
         print("Task not found")  
@@ -128,12 +124,14 @@ def change_task_status() -> None:
         if status in ("todo", "doing", "done"):
             break
     task = task_repository.get(id)
-    inputs = TypedDict()
-    inputs["name"] = task.name
-    inputs["description"] = task.description
-    inputs["status"] = status
-    inputs["deadline"] = task.deadline
-    inputs["project_id"] = task.project_id
+    inputs : TaskDict = {
+        "name" : task.name
+        ,"description" : task.description
+        ,"status" : status
+        ,"deadline" : task.deadline
+        ,"project_id" : task.project_id
+    }
+    task_repository.update(id, inputs)
     print("<Status changed successfully.>")
 
 
@@ -141,10 +139,10 @@ def edit_task() -> None :
     id = search_project_by_id()
     list_tasks(id)
     task_id = search_task_by_project_id(id)
-    if task_repository.get(id) == None:
+    if task_repository.get(task_id) == None:
         return
     inputs = input_task()
-    inputs.project_id = task_repository.get(task_id).project_id
+    inputs["project_id"] = task_repository.get(task_id).project_id
     task_repository.update(task_id, inputs)
     print("<Task's details were edited successfully.>")
 
