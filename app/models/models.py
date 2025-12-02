@@ -27,6 +27,7 @@ class TaskDict(TypedDict):
     description: str = "-"
     status: Literal["todo", "doing", "done"] = "todo"
     deadline: datetime = None
+    project_id: int = 0
 
 
 class Task(Base):
