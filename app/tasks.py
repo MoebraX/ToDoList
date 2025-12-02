@@ -6,17 +6,15 @@ class TaskDict(TypedDict):
     description: str = "-"
     status: Literal["todo", "doing", "done"] = "todo"
     deadline: datetime = None
+    project_id: int
 
 
 class Task:
-    _id_counter = 0
     def __init__(self, inputs = TaskDict):
         if len(inputs["name"]) > 30 :
             raise ValueError("Task name can't be longer than 30 characters.")
         if len(inputs["description"]) > 150 :
             raise ValueError("Task description can't be longer than 150 characters.")
-        self.id = Task._id_counter
-        Task._id_counter += 1
         self.name = inputs["name"]
         self.description = inputs["description"]
         self.status = inputs["status"]
