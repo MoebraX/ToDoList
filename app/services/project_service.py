@@ -1,25 +1,10 @@
-from tasks import *
+from services.task_service import *
+from dotenv import load_dotenv
+import os
 
-class Project:
-    _id_counter = 0
-    def __init__(self, name: str = "default_name", description: str = "-"):
-        if len(name) > 30 :
-            raise ValueError("Project name can't be longer than 30 characters.")
-        if len(description) > 150 :
-            raise ValueError("Project description can't be longer than 150 characters.")
-        self.id = Project._id_counter
-        Project._id_counter += 1
-        self.name = name
-        self.description = description
-        self.tasks: list[Task] = []
+load_dotenv()
 
-projects_db: list[Project] = []
-
-def pass_projects_from_db() -> list[Project] :
-    return projects_db
-
-def add_project_to_db(project: Project) -> None:
-    projects_db.append(project)
+project_repository = ProjectRepository()
     
 
 def input_project() -> list[str]:
@@ -31,7 +16,7 @@ def input_project() -> list[str]:
         if len(name) > 30:
             print("Name can't be longer than 30 characters. Try a shorter name.")
             continue
-        for project in pass_projects_from_db():
+        for project in project_repository.get_all():
             if name == project.name:
                 print("This name already exists. Try another name.")
                 continue
@@ -41,7 +26,7 @@ def input_project() -> list[str]:
         if len(description) > 150:
             print("Description can't be longer than 150 characters. Try again.")
             continue
-        if description == " " or description.isspace():
+        if description == "" or description.isspace():
             description = "-"
         break
     inputs = [name,description]
@@ -50,125 +35,129 @@ def input_project() -> list[str]:
 
 def create_project() -> Project:
     inputs = input_project()
-    new_project = Project(inputs[0], inputs[1])
-    add_project_to_db(new_project)
+    new_project = project_repository.add(inputs[0], inputs[1])
     print("<Project created successfully!>")
     return new_project
     
 
 def list_projects() -> None:
-    if pass_projects_from_db() == []:
+    if project_repository.get_all() == []:
         print("<There's no existing project.>")
         return
     print("__________________________")
     print("\tID\t|\tName\t|\tDescription")
-    for project in pass_projects_from_db():
+    for project in project_repository.get_all():
         print(f"\t{project.id}\t|\t{project.name}\t|\t{project.description}")
     print("__________________________")
 
 
-def search_project_by_id() -> Project:
-    if pass_projects_from_db() == []:
+def search_project_by_id() -> int | None:
+    if project_repository.get_all() == []:
         print("<There's no existing project.>")
         return
     list_projects()
-    flag = False
-    while flag == False:
+    while True:
         print("Enter project's id: ")
         target_id = int(input())
-        for project in pass_projects_from_db():
-            if project.id == target_id:
-                return project
-        if flag == False :
+        project = project_repository.get(target_id)
+        if project == None :
             print("The entered id was not found. Try again.")
+        else:
+            return target_id
 
 
 def edit_project() -> None:
-    project = search_project_by_id()
+    id = search_project_by_id()
+    if id == None:
+        return
     inputs = input_project()
-    project.name = inputs["name"]
-    project.description = inputs["description"]    
+    project_repository.update(id, inputs[0], inputs[1])   
 
     
 def add_task() -> None:
-    if pass_projects_from_db() == []:
+    if project_repository.get_all() == []:
         print("<There's no existing project.>")
         return
-    project = search_project_by_id()
-    if len(project.tasks) > int(os.getenv("MAX_NUMBER_OF_TASK")) :
+    id = search_project_by_id()
+    if id == None:
+        return
+    length = len(project_repository.get(id).tasks)
+    if length > int(os.getenv("MAX_NUMBER_OF_TASK")) :
         print("<The max number of tasks for this project is reached.>")
         return
-    new_task = create_task()
-    project.tasks.append(new_task)
+    inputs = input_task()
+    inputs["project_id"] = id
+    task_repository.add(inputs)
     print("<New task created successfully.>")
 
 
-def list_tasks(project: Project) -> None:
-    if len(project.tasks) == 0 :
+def list_tasks(id: int) -> None:
+    if len(project_repository.get(id).tasks) == 0 :
         print("No task exists.")
         return
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^")
     print("\tID\t|\tName\t|\tDescription\t|\tStatus\t|\tDeadline")
-    for task in project.tasks:
+    for task in project_repository.get(id).tasks:
         print(f"\t{task.id}\t|\t{task.name}\t|\t{task.description}\t|\t{task.status}\t|\t{task.deadline}")
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^")
-    return project
 
 
-def search_task_by_project(project: Project) -> Task | None:
-    if project == None:
+def search_task_by_project_id(id: int) -> int | None:
+    if id == None:
         return
-    if len(project.tasks) == 0 :
+    if len(project_repository.get(id).tasks) == 0 :
         print("No task exists.")
         return
     while True :
         target_id = int(input("Enter task id: "))
-        for task in project.tasks:
+        tasks = project_repository.get(id).tasks
+        for task in tasks:
             if target_id == task.id :
-                return task
+                return target_id
         print("Task not found")  
     
 def change_task_status() -> None:
-    task = search_task_by_project(search_project_by_id())
+    id = search_task_by_project_id(search_project_by_id())
     status = ""
     while True:
         status = str(input("Enter new status (todo/doing/done): "))
         if status in ("todo", "doing", "done"):
             break
-    task.status = status
+    task = task_repository.get(id)
+    inputs : TaskDict = {
+        "name" : task.name
+        ,"description" : task.description
+        ,"status" : status
+        ,"deadline" : task.deadline
+        ,"project_id" : task.project_id
+    }
+    task_repository.update(id, inputs)
     print("<Status changed successfully.>")
 
 
 def edit_task() -> None :
-    project = search_project_by_id()
-    list_tasks(project)
-    task = search_task_by_project(project)
-    if task == None:
+    id = search_project_by_id()
+    list_tasks(id)
+    task_id = search_task_by_project_id(id)
+    if task_repository.get(task_id) == None:
         return
     inputs = input_task()
-    task.name = inputs["name"]
-    task.description = inputs["description"]
-    task.status = inputs["status"]
-    task.deadline = inputs["deadline"]
+    inputs["project_id"] = task_repository.get(task_id).project_id
+    task_repository.update(task_id, inputs)
     print("<Task's details were edited successfully.>")
 
 
 def delete_task() -> None:
-    project = search_project_by_id()
-    list_tasks(project)
-    task = search_task_by_project(project)
-    if task == None:
+    id = search_project_by_id()
+    list_tasks(id)
+    task_id = search_task_by_project_id(id)
+    if task_id == None:
         return
-    project.tasks.remove(task)
-    del task
+    task_repository.delete(task_id)
     print("<Task deleted successfully.>")
 
 
 def delete_project() -> None:
-    project = search_project_by_id()
-    for task in project.tasks:
-        project.tasks.remove(task)
-        del task
-    pass_projects_from_db().remove(project)
-    del project
+    id = search_project_by_id()
+    project_repository.delete(id)
     print("<Project deleted successfully.>")

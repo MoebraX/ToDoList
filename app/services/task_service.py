@@ -1,30 +1,16 @@
 from datetime import datetime, timedelta
-from typing import Literal
-from typing import TypedDict
-from dotenv import load_dotenv
-import os
-load_dotenv()
+from typing import Literal, TypedDict
+from repositories.repositories import *
+
+
+task_repository = TaskRepository()
 
 class TaskDict(TypedDict):
     name: str
     description: str = "-"
     status: Literal["todo", "doing", "done"] = "todo"
     deadline: datetime = None
-
-
-class Task:
-    _id_counter = 0
-    def __init__(self, inputs = TaskDict):
-        if len(inputs["name"]) > 30 :
-            raise ValueError("Task name can't be longer than 30 characters.")
-        if len(inputs["description"]) > 150 :
-            raise ValueError("Task description can't be longer than 150 characters.")
-        self.id = Task._id_counter
-        Task._id_counter += 1
-        self.name = inputs["name"]
-        self.description = inputs["description"]
-        self.status = inputs["status"]
-        self.deadline = inputs["deadline"] or (datetime.now() + timedelta(days=10))
+    project_id: int
 
 
 def input_task() -> TaskDict:
@@ -42,7 +28,7 @@ def input_task() -> TaskDict:
         if len(description) > 150:
             print("Description can't be longer than 150 characters. Try again.")
             continue
-        if description == " " or description.isspace():
+        if description == "" or description.isspace():
             description = "-"
         break
     while True:
@@ -67,7 +53,7 @@ def input_task() -> TaskDict:
             print("The entered date/time is in the past.")
             continue
         break
-    inputs = TaskDict(name = name, description = description, status = status, deadline = dt)
+    inputs = TaskDict(name = name, description = description, status = status, deadline = dt, project_id = 1)
     return inputs
 
 
