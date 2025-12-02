@@ -76,7 +76,7 @@ class TaskRepository(Repository[Task]):
         with Session() as session:
             return session.query(Task).filter(Task.id == id).first()
 
-    def get_all(self) -> list[Task]:
+    def get_all(self) -> List[Task]:
         with Session() as session:
             return session.query(Task).all()
 
