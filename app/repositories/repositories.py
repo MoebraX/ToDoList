@@ -72,7 +72,7 @@ class TaskRepository(Repository[Task]):
     def __init__(self) -> None :
         pass
 
-    def get(self, id: int) -> Task:
+    def get(self, id: int) -> Task | None:
         with Session() as session:
             return session.query(Task).filter(Task.id == id).first()
 

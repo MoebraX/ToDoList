@@ -1,0 +1,2 @@
+class MaximumNumberOfProjectsReached(Exception):
+    pass
