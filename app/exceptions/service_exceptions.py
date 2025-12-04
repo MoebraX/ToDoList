@@ -3,3 +3,12 @@ class MaximumNumberOfProjectsReached(Exception):
 
 class ProjectNotFound(Exception):
     pass
+
+class MaximumNumberOfTasksReached(Exception):
+    pass
+
+class TaskNotFound(Exception):
+    pass
+
+class TaskStatusIncorrect(Exception):
+    pass

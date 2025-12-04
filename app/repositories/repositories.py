@@ -51,7 +51,7 @@ class ProjectRepository(Repository[Project]):
     def update(self, id: int, name: str, description: str) -> Project:
         with Session() as session:
             project = session.query(Project).filter(Project.id == id).first()
-            if project is None:
+            if project == None:
                 raise ValueError(f"Project with id {id} not found")
             project.name = name
             project.description = description
@@ -95,7 +95,7 @@ class TaskRepository(Repository[Task]):
     def update(self, id: int, inputs: TaskDict) -> Task:
         with Session() as session:
             task = session.query(Task).filter(Task.id == id).first()
-            if task is None:
+            if task == None:
                 raise ValueError(f"Project with id {id} not found")
             task.name = inputs["name"]
             task.description = inputs["description"]
