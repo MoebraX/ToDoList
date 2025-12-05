@@ -28,8 +28,10 @@ def api_create_project(inputs: ProjectData):
                     "name: " : project.name,
                     "description: " : project.description}
         return response
-    except:
-        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except MaximumNumberOfProjectsReached:
+        raise HTTPException(status_code = status.HTTP_406_NOT_ACCEPTABLE, detail="Maximum number of projects reached") 
+    except ProjectNameAlreadyExists:
+        raise HTTPException(status_code = status.HTTP_406_NOT_ACCEPTABLE, detail="A Project with this name already exists")
 
 
 @app.get("/projects/all",status_code = status.HTTP_200_OK)
