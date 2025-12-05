@@ -20,7 +20,7 @@ class TaskData(BaseModel):
 app = FastAPI()
 
 
-@app.post("/projects/create", status_code = status.HTTP_201_CREATED)
+@app.post("/projects", status_code = status.HTTP_201_CREATED)
 def api_create_project(inputs: ProjectData):
     try:
         project = create_project(inputs.name, inputs.description)
@@ -48,7 +48,7 @@ def api_list_projects():
         raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
-@app.patch("/projects/{target_id}/edit",status_code = status.HTTP_200_OK)
+@app.patch("/projects/{target_id}",status_code = status.HTTP_200_OK)
 def api_edit_project(target_id: int, inputs: ProjectData):
     try:
         project = edit_project(target_id = target_id, name = inputs.name,
@@ -61,7 +61,7 @@ def api_edit_project(target_id: int, inputs: ProjectData):
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail="Project not found")
 
 
-@app.delete("/projects/{target_id}/delete", status_code = status.HTTP_200_OK)
+@app.delete("/projects/{target_id}", status_code = status.HTTP_200_OK)
 def api_delete_project(target_id: int):
     try:
         delete_project(target_id)
@@ -70,7 +70,7 @@ def api_delete_project(target_id: int):
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail="Project not found")
     
 
-@app.post("/tasks/add", status_code = status.HTTP_201_CREATED)
+@app.post("/tasks", status_code = status.HTTP_201_CREATED)
 def api_create_task(inputs: TaskData):
     try:
         inputs2: TaskDict = {
@@ -111,7 +111,7 @@ def api_list_tasks_by_project(target_id: int):
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail="Project not found")
     
 
-@app.patch("/tasks/{target_id}/change_status/{new_status}", status_code=status.HTTP_200_OK)
+@app.patch("/tasks/{target_id}/{new_status}", status_code=status.HTTP_200_OK)
 def api_change_task_status(target_id: int, new_status: Literal["todo", "doing", "done"]):
     try:
         task = change_task_status(target_id, new_status)
@@ -128,7 +128,7 @@ def api_change_task_status(target_id: int, new_status: Literal["todo", "doing", 
 
     
 
-@app.patch("/tasks/{target_id}/edit", status_code = status.HTTP_200_OK)
+@app.patch("/tasks/{target_id}", status_code = status.HTTP_200_OK)
 def api_edit_task(target_id: int, inputs: TaskData):
     try:
         inputs2: TaskDict = {
@@ -150,7 +150,7 @@ def api_edit_task(target_id: int, inputs: TaskData):
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail="Task not found")
     
 
-@app.delete("/tasks/{target_id}/delete", status_code = status.HTTP_200_OK)
+@app.delete("/tasks/{target_id}", status_code = status.HTTP_200_OK)
 def api_delete_task(target_id: int):
     try:
         delete_task(target_id)
