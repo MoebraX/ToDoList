@@ -13,6 +13,9 @@ def create_project(name: str, description: str) -> Project:
     projects = project_repository.get_all()
     if len(projects) >= int(os.getenv("MAX_NUMBER_OF_PROJECT")):
         raise MaximumNumberOfProjectsReached
+    for project in projects:
+        if name == project.name:
+            raise ProjectNameAlreadyExists
     return project_repository.add(name, description)
     
 
